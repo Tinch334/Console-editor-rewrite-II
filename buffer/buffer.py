@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 import os.path
+import re
 
 from buffer.line_array import LineArray, Line
 from buffer.cursor import Cursor, CursorMoveDirection
@@ -21,6 +22,9 @@ class Buffer:
         self._l_array = LineArray()
         self._cursor = Cursor(self._l_array, 0, 0)
 
+#################
+#Buffer handling
+#################
     #Adds a character to the buffer on the cursors current position.
     def add_str(self, string: str) -> None:
         self._buffer_modified_handler()
@@ -93,9 +97,33 @@ class Buffer:
         else:
             self._l_array.larray_delete_pos(Point(cursor_pos.x + 1, cursor_pos.y))
 
+    #Searches the buffer for strings that match the given regex and highlights them, returns the amount of matches found, this can be zero.
+    def highlight_regex(self, regex: str) -> int:
+        #Clear any previous highlighted text.
+        self._l_array.larray_highlight_clear()
+        
+        complied_re = re.compile(regex)
+        match_count = 0
+
+        #Go through each line in the buffer and iterate through all the matches highlighting and counting them.
+        for a in range(self._l_array.larray_get_length()):
+            matches = complied_re.finditer(self._l_array.larray_get_line(a).data)
+
+            for match in matches:
+                self._l_array.larray_highlight_slice(a, match.start(), match.end())
+                match_count += 1
+
+        return match_count
+
     #To be called each time the buffer is modified.
     def _buffer_modified_handler(self) -> None:
         self._set_dirty(True)
+        #Matched strings could have been modified.
+        self._l_array.larray_highlight_clear()
+
+#################
+#Cursor handling
+#################
 
     #Moves the cursor in the specified position.
     def move_cursor(self, dir: CursorMoveDirection) -> None:
@@ -120,6 +148,22 @@ class Buffer:
     #Gets the position of the cursor associated with the buffer, this is done to maintain "_cursor" private.
     def get_cursor_pos(self) -> Point:
         return self._cursor.get_position()
+
+#################
+#Highlight handling
+#################
+
+    #Sets the portion of the line between "start" and "end" at the specified line as highlighted.
+    def set_highlight(self, index: int, start: int, end: int) -> None:
+        self._l_array.larray_highlight_slice(index, start, end)
+
+    #Clears the highlighted sections from all lines.
+    def clear_highlight(self) -> None:
+        self._l_array.larray_highlight_clear()
+
+#################
+#File handling
+#################
 
     #Returns the filename associated with the buffer.
     def get_filename(self) -> Optional[str]:
@@ -191,11 +235,10 @@ class Buffer:
         except OSError:
             return "The given file path cannot be accessed"
         else:
-            self._l_array.larray_empty()
+            self._l_array.larray_initialize()
 
             try:
                 index = 0
-                first = True
 
                 #We read each line in the file and write it to the buffer.
                 for line in file.readlines():

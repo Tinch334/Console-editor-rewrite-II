@@ -11,6 +11,9 @@ COLOURS:
     text:
         fg: *WHITE
         bg: *BLACK
+    highlight:
+        fg: *WHITE
+        bg: *CYAN
     cursor:
         fg: *BLACK
         bg: *WHITE

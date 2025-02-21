@@ -20,11 +20,11 @@ class Cursor:
     def __init__(self, l_array: LineArray, xPos: int, yPos: int) -> None:
         self._l_array = l_array
         self._position = Point(xPos, yPos)
-        #The start and end position of the text selected by the cursor.
+        #The end position of the text selected by the cursor.
         self._cursor_selection: Optional[Point] = None
-        #This variables stores the X position the cursor would like to be in, it's used when moving vertically from one line to another line and the
-        #line we are moving to isn't long enough for the cursor to have it's previous horizontal position. When not in use it's set to "-1" to allow
-        #for easy and always false comparisons using "max".
+        #This variables stores the X position the cursor would like to be in, it's used when moving vertically from one line to another line 
+        #and the line we are moving to isn't long enough for the cursor to have it's previous horizontal position. When not in use it's set to
+        #"-1" to allow for easy and always false comparisons using "max".
         self._desired_x_position = -1
 
     def get_position(self) -> Point:
@@ -90,8 +90,8 @@ class Cursor:
         new_line_len = len(self._l_array.larray_get_line(new_y).data)
         new_x = max(self._position.x, self._desired_x_position)
 
-        #If new_x is shorter than the line, we set the cursors X position normally. Otherwise we set the cursor to the end of the line and set the
-        #desired position.
+        #If new_x is shorter than the line, we set the cursors X position normally. Otherwise we set the cursor to the end of the line and set
+        #the desired position.
         if new_x < new_line_len:
             self._desired_x_position = -1
             self._position.x = new_x

@@ -86,6 +86,14 @@ class ConsoleEditor():
             else:
                 quit()
 
+        elif key_code == Screen.ctrl("f"):
+            regex = self.input_prompt.get_input("Find: ")
+
+            if regex != None:
+                res = self.buffer.highlight_regex(regex)
+                #Show how many matches were found.
+                self.info_bar.set_current_text(f"{'No' if res == 0 else res} matches found for \"{regex}\"")
+
         #Up
         elif key_code == Screen.ctrl("i"):
             pass

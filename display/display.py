@@ -83,20 +83,43 @@ class Display():
         end_x = screen.dimensions[1] + self.display_info.x_end
         end_y = screen.dimensions[0] + self.display_info.y_end
 
+        normal_fg = Config.get_config()["COLOURS"]["text"]["fg"]
+        normal_bg = Config.get_config()["COLOURS"]["text"]["bg"]
+        highlighted_fg = Config.get_config()["COLOURS"]["highlight"]["fg"]
+        highlighted_bg = Config.get_config()["COLOURS"]["highlight"]["bg"]
+
         #We iterate through every line between the scroll and the end of the buffer, we do the same in each line with the characters. Every iteration
         #we check if the printing indexes we are using have exceeded the ones specified in the buffer configuration to avoid printing out of bounds.
         for y in range(self.display_info.y_scroll, self.buffer.get_length()):
             display_x = self.display_info.x_start
-            current_line = self.buffer.get_line(y).data
+            current_line = self.buffer.get_line(y)
 
-            for x in range(self.display_info.x_scroll, len(current_line)):
-                screen.print_at(current_line[x], display_x, display_y,
-                    colour = Config.get_config()["COLOURS"]["text"]["fg"], bg = Config.get_config()["COLOURS"]["text"]["bg"])
-    
-                #X printing index check.
-                display_x += 1
-                if display_x >= end_x:
-                    break
+            #Avoids unnecessary checks if there are no highlighted sections on the line.
+            if current_line.highlight == None:
+                for x in range(self.display_info.x_scroll, len(current_line.data)):
+                    screen.print_at(current_line.data[x], display_x, display_y,
+                        colour = normal_fg, bg = normal_bg)
+
+                    #X printing index check.
+                    display_x += 1
+                    if display_x >= end_x:
+                        break
+            else:
+                for x in range(self.display_info.x_scroll, len(current_line.data)):
+                    if x in current_line.highlight:
+                        fg_colour = highlighted_fg
+                        bg_colour = highlighted_bg
+                    else:
+                        fg_colour = normal_fg
+                        bg_colour = normal_bg
+
+                    screen.print_at(current_line.data[x], display_x, display_y,
+                        colour = fg_colour, bg = bg_colour)
+
+                    #X printing index check.
+                    display_x += 1
+                    if display_x >= end_x:
+                        break
 
             #Y printing index check.
             display_y += 1
