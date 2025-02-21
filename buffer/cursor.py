@@ -11,17 +11,10 @@ class CursorMoveDirection(Enum):
     UP = auto()
     DOWN = auto()
 
-class Cursors(Enum):
-    MAIN_CURSOR = auto()
-    SELECTION_CURSOR = auto()
-
-
 class Cursor:
     def __init__(self, l_array: LineArray, xPos: int, yPos: int) -> None:
         self._l_array = l_array
         self._position = Point(xPos, yPos)
-        #The end position of the text selected by the cursor.
-        self._cursor_selection: Optional[Point] = None
         #This variables stores the X position the cursor would like to be in, it's used when moving vertically from one line to another line 
         #and the line we are moving to isn't long enough for the cursor to have it's previous horizontal position. When not in use it's set to
         #"-1" to allow for easy and always false comparisons using "max".
@@ -35,13 +28,6 @@ class Cursor:
 
     def get_y(self) -> int:
         return self._position.y
-
-    #If there's selected text returns the position of the second cursor.
-    def get_selection_position(self) -> Optional[Point]:
-        if self._cursor_selection != None:
-            return self._cursor_selection
-        
-        return None
 
     #If possible moves the cursor in the specified direction.
     def move(self, dir: CursorMoveDirection) -> None:

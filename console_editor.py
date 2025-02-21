@@ -12,7 +12,7 @@ from configuration.config import Config
 class ConsoleEditor():
     def __init__(self) -> None:
         self.buffer = Buffer()
-        self.info_bar = InfoBar("Commands: Ctrl+O: Save - Ctrl+R: Load - Ctrl+Q: Quit", 3.5)
+        self.info_bar = InfoBar("Commands: Ctrl+O: Write Out - Ctrl+R: Read File - Ctrl+Q: Quit - Ctrl+F: Find", 3.5)
         self.display = Display(self.buffer, self.info_bar)
         self.config = Config("configuration/config.yaml")
 
@@ -32,8 +32,6 @@ class ConsoleEditor():
             while True:
                 self.get_input(screen)
                 self.display.display_to_screen(screen)
-
-                #raise Exception(Config.get_config()["VARS"]["name"])
 
 
     def get_input(self, screen: Screen) -> None:

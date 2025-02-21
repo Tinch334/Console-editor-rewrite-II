@@ -20,3 +20,10 @@ COLOURS:
     status bar:
         fg: *WHITE
         bg: *BLUE
+    matching brace:
+        fg: *WHITE
+        bg: *CYAN
+
+GENERAL CONFIG:
+    matching brace:
+        show matching brace: true
