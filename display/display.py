@@ -31,6 +31,7 @@ class Display():
         self.info_bar = info_bar
 
         self.display_info = DisplayInfo()
+        self.colours = Config.get_config()["COLOURS"]
 
 
     def display_to_screen(self, screen: Screen) -> None:
@@ -68,8 +69,8 @@ class Display():
         #set the scroll to be enough so the cursor appears on the last line.
         if cursor_pos.y > end_y + self.display_info.y_scroll - 1:
             self.display_info.y_scroll = cursor_pos.y - end_y + 1
-        #If the cursor goes above the printed part of the buffer we set the scroll to the cursor's position, which is just enough for the cursor
-        #to appear on the first line.
+        #If the cursor goes above the printed part of the buffer we set the scroll to the cursor's position, which is just enough for the
+        #cursor to appear on the first line.
         elif cursor_pos.y < self.display_info.y_scroll:
             self.display_info.y_scroll = cursor_pos.y
 
@@ -77,8 +78,8 @@ class Display():
         #numbers are enabled.
         if cursor_pos.x > end_x - self.display_info.x_start + self.display_info.x_scroll - 1:
             self.display_info.x_scroll = cursor_pos.x - end_x + self.display_info.x_start + 1 
-        #If the cursor goes above the printed part of the buffer we set the scroll to the cursor's position, which is just enough for the cursor
-        #to appear on the first line.
+        #If the cursor goes above the printed part of the buffer we set the scroll to the cursor's position, which is just enough for the
+        #cursor to appear on the first line.
         elif cursor_pos.x < self.display_info.x_scroll:
             self.display_info.x_scroll = cursor_pos.x
 
@@ -89,10 +90,10 @@ class Display():
         end_x = screen.dimensions[1] + self.display_info.x_end
         end_y = screen.dimensions[0] + self.display_info.y_end
 
-        normal_fg = Config.get_config()["COLOURS"]["text"]["fg"]
-        normal_bg = Config.get_config()["COLOURS"]["text"]["bg"]
-        highlighted_fg = Config.get_config()["COLOURS"]["highlight"]["fg"]
-        highlighted_bg = Config.get_config()["COLOURS"]["highlight"]["bg"]
+        normal_fg = self.colours["text"]["fg"]
+        normal_bg = self.colours["text"]["bg"]
+        highlighted_fg = self.colours["highlight"]["fg"]
+        highlighted_bg = self.colours["highlight"]["bg"]
 
         #We iterate through every line between the scroll and the end of the buffer, we do the same in each line with the characters. Every
         #iteration we check if the printing indexes we are using have exceeded the ones specified in the buffer configuration to avoid printing
@@ -141,11 +142,11 @@ class Display():
         #Check whether the cursor is at the end of the line and change it's colour appropriately.
         if cursor_pos.x > len(current_line_data) - 1:
             screen.print_at(" ", cursor_pos.x + self.display_info.x_start, cursor_pos.y - self.display_info.y_scroll,
-                bg = Config.get_config()["COLOURS"]["cursor"]["bg"])
+                bg = self.colours["cursor"]["bg"])
         else:
             screen.print_at(current_line_data[cursor_pos.x], cursor_pos.x + self.display_info.x_start - self.display_info.x_scroll,
-                cursor_pos.y - self.display_info.y_scroll, colour = Config.get_config()["COLOURS"]["cursor"]["fg"],
-                bg = Config.get_config()["COLOURS"]["cursor"]["bg"])
+                cursor_pos.y - self.display_info.y_scroll, colour = self.colours["cursor"]["fg"],
+                bg = self.colours["cursor"]["bg"])
 
     #If the cursor is on top of a brace shows the matching opening/closing brace.
     def display_matching_brace(self, screen: Screen) -> None:
@@ -158,8 +159,8 @@ class Display():
         #It does not matter if the match was found outside of screen bounds, printing to a non visible location does nothing.
         match_line = self.buffer.get_line(matching_brace_pos.y).data
         screen.print_at(match_line[matching_brace_pos.x], matching_brace_pos.x + self.display_info.x_start,
-                matching_brace_pos.y - self.display_info.y_scroll, colour = Config.get_config()["COLOURS"]["matching brace"]["fg"],
-                bg = Config.get_config()["COLOURS"]["matching brace"]["bg"])
+                matching_brace_pos.y - self.display_info.y_scroll, colour = self.colours["matching brace"]["fg"],
+                bg = self.colours["matching brace"]["bg"])
 
     #Gets the position of the matching opening/closing brace.
     def _get_matching_brace_pos(self, screen: Screen) -> Optional[Point]:
@@ -235,7 +236,8 @@ class Display():
         final_string = f"{left_text}{' ' * (screen.dimensions[1] - len(left_text) - len(right_text))}{right_text}"
 
         #The status bar is printed right after the buffer.
-        screen.print_at(final_string, 0, screen.dimensions[0] + self.display_info.y_end, colour = Config.get_config()["COLOURS"]["status bar"]["fg"], bg = Config.get_config()["COLOURS"]["status bar"]["bg"])
+        screen.print_at(final_string, 0, screen.dimensions[0] + self.display_info.y_end, colour = self.colours["status bar"]["fg"],
+            bg = Config.get_config()["COLOURS"]["status bar"]["bg"])
 
     def display_info_bar(self, screen: Screen) -> None:
         screen.print_at(self.info_bar.get_current_text(), 0, screen.dimensions[0] + self.display_info.y_end + 1)

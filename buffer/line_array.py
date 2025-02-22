@@ -78,6 +78,12 @@ class LineArray:
 
         return self._lines[index]
 
+    #Sets the specified line of the array, allows for the highlighting to be set as well.
+    def larray_set_line(self, index: int, string: str, highlight: Optional[Set[int]] = None) -> None:
+        self._validate_index(index)
+
+        self._lines[index] = Line(string, highlight)
+
 #################
 #Highlight handling
 #################

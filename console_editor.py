@@ -11,10 +11,10 @@ from configuration.config import Config
 
 class ConsoleEditor():
     def __init__(self) -> None:
-        self.buffer = Buffer()
-        self.info_bar = InfoBar("Commands: Ctrl+O: Write Out - Ctrl+R: Read File - Ctrl+Q: Quit - Ctrl+F: Find", 3.5)
-        self.display = Display(self.buffer, self.info_bar)
         self.config = Config("configuration/config.yaml")
+        self.buffer = Buffer()
+        self.info_bar = InfoBar("Commands: Ctrl+O: Write Out - Ctrl+R: Read File - Ctrl+Q: Quit - Ctrl+F: Find - Ctrl+P: Replace", 3.5)
+        self.display = Display(self.buffer, self.info_bar)
 
         self.input_prompt = None
         self.confirmation_prompt = None
@@ -89,8 +89,25 @@ class ConsoleEditor():
 
             if regex != None:
                 res = self.buffer.highlight_regex(regex)
-                #Show how many matches were found.
-                self.info_bar.set_current_text(f"{'No' if res == 0 else res} matches found for \"{regex}\"")
+
+                if res == None:
+                    self.info_bar.set_current_text("Invalid regex")
+                else:
+                    #Show how many matches were found.
+                    self.info_bar.set_current_text(f"{'No' if res == 0 else res} matches found for \"{regex}\"")
+
+        elif key_code == Screen.ctrl("p"):
+            regex = self.input_prompt.get_input("Replace: ")
+            replace_with = self.input_prompt.get_input("Replace with: ")
+
+            if regex != None and replace_with != None:
+                res = self.buffer.replace_regex(regex, replace_with)
+
+                if res == None:
+                    self.info_bar.set_current_text("Invalid regex")
+                else:
+                    #Show how many matches were found.
+                    self.info_bar.set_current_text(f"Made {'no' if res == 0 else res} replacements")
 
         #Up
         elif key_code == Screen.ctrl("i"):

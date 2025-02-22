@@ -98,11 +98,17 @@ class Buffer:
             self._l_array.larray_delete_pos(Point(cursor_pos.x + 1, cursor_pos.y))
 
     #Searches the buffer for strings that match the given regex and highlights them, returns the amount of matches found, this can be zero.
-    def highlight_regex(self, regex: str) -> int:
+    #If the given regex is invalid returns "None".
+    def highlight_regex(self, regex: str) -> Optional[int]:
         #Clear any previous highlighted text.
         self._l_array.larray_highlight_clear()
         
-        complied_re = re.compile(regex)
+        #Check if the given regex is valid.
+        try:
+            complied_re = re.compile(regex)
+        except:
+            return None
+
         match_count = 0
 
         #Go through each line in the buffer and iterate through all the matches highlighting and counting them.
@@ -114,6 +120,29 @@ class Buffer:
                 match_count += 1
 
         return match_count
+
+    #Replaces the with the specified string. Returns how many replacements were performed, can be zero. #If the given regex is invalid returns
+    #"None".
+    def replace_regex(self, regex: str, replace_with: str) -> Optional[int]:
+        total_substitutions = 0
+
+        #Check if the given regex is valid.
+        try:
+            complied_re = re.compile(regex)
+        except:
+            return None
+
+        #Go through each line in the buffer and replaces the matching regex, counts how many replacements were performed.
+        for a in range(self._l_array.larray_get_length()):
+            (updated_line, line_substitutions) = re.subn(regex, replace_with, self._l_array.larray_get_line(a).data) 
+            self._l_array.larray_set_line(a, updated_line)
+            total_substitutions += line_substitutions
+
+        #If any substitutions were performed the buffer has been modified.
+        if total_substitutions:
+            self._buffer_modified_handler()
+
+        return total_substitutions
 
     #To be called each time the buffer is modified.
     def _buffer_modified_handler(self) -> None:
